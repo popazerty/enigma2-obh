@@ -672,20 +672,21 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 				iPlayableService.evEOF: self.__evEOF,
 				#iPlayableService.evSOF: self.__evSOF,
 			})
-		self.onExecBegin.append(self.asciiOn)
+		try:
+			vumachine = file("/proc/stb/info/vumodel").read().strip()
+			if vumachine == "ultimo" or vumachine == "zero":
+				self.onExecBegin.append(self.asciiOff)
+			else:
+				self.onExecBegin.append(self.asciiOn)
+		except:
+			self.onExecBegin.append(self.asciiOn)
 		config.misc.standbyCounter.addNotifier(self.standbyCountChanged, initial_call=False)
 
 	def isProtected(self):
 		return config.ParentalControl.setuppinactive.value and config.ParentalControl.config_sections.movie_list.value
 
 	def standbyCountChanged(self, value):
-		path = self.getTitle().split(" /", 1)
-		if path and len(path) > 1:
-			if [x for x in path[1].split("/") if x.startswith(".") and not x.startswith(".Trash")]:
-				moviepath = defaultMoviePath()
-				if moviepath:
-					config.movielist.last_videodir.value = defaultMoviePath()
-					self.close(None)
+		self.close(None)
 
 	def unhideParentalServices(self):
 		if self.protectContextMenu:

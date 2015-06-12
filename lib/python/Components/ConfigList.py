@@ -18,10 +18,21 @@ class ConfigList(HTMLComponent, GUIComponent, object):
 		self.onSelectionChanged = [ ]
 		self.current = None
 		self.session = session
+		try:
+			vumachine = file("/proc/stb/info/vumodel").read().strip()
+		except:
+			vumachine = ""
 
 	def execBegin(self):
 		rcinput = eRCInput.getInstance()
-		rcinput.setKeyboardMode(rcinput.kmAscii)
+		try:
+			vumachine = file("/proc/stb/info/vumodel").read().strip()
+			if vumachine == "ultimo" or vumachine == "zero":
+				rcinput.setKeyboardMode(rcinput.kmNone)
+			else:
+				rcinput.setKeyboardMode(rcinput.kmAscii)
+		except:
+			rcinput.setKeyboardMode(rcinput.kmAscii)
 		self.timer.callback.append(self.timeout)
 
 	def execEnd(self):
